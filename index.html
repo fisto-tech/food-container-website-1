@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en" class="antialiased scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Meta Tags & SEO -->
+    <title>Eat Fit | Freshness Redefined</title>
+    <meta name="description" content="Culinary preservation elevated to an art form. Eat Fit is the ultimate ecosystem for your food.">
+    
+    <!-- Google Fonts: Cinzel (Serif) & Outfit (Sans) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Outfit:wght@200;300;400;500&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        base: '#000000',
+                        surface: '#080808',
+                        surfaceElevated: '#111111',
+                        textMain: '#ffffff',
+                        textMuted: '#b3b3b3',
+                        gold: '#Bfa67a',
+                        borderSubtle: 'rgba(255,255,255,0.15)'
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Cinzel', 'serif'],
+                    },
+                    letterSpacing: {
+                        widest: '.25em',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-base text-textMain font-sans overflow-x-hidden">
+
+    <!-- PRELOADER -->
+    <div id="preloader" class="fixed inset-0 z-[99999] bg-[#000] flex flex-col items-center justify-center overflow-hidden">
+        <!-- Ambient Radial Gold Glow behind the logo -->
+        <div class="absolute w-[500px] h-[500px] bg-gold/10 rounded-full filter blur-[120px] opacity-60 mix-blend-screen pointer-events-none animate-pulse" style="animation-duration: 4s;"></div>
+
+        <!-- Central Dial Container -->
+        <div class="relative w-72 h-72 flex items-center justify-center">
+            
+            <!-- SVG Concentric Circular Progress Rings -->
+            <svg class="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 200 200">
+                <!-- Subtle outer structural ring -->
+                <circle cx="100" cy="100" r="88" stroke="rgba(191, 166, 122, 0.05)" stroke-width="1" fill="none"></circle>
+                <!-- Inner track ring -->
+                <circle cx="100" cy="100" r="82" stroke="rgba(255, 255, 255, 0.03)" stroke-width="1.5" fill="none"></circle>
+                <!-- Active Gold progress ring -->
+                <circle id="preloader-circle" cx="100" cy="100" r="82" stroke="#Bfa67a" stroke-width="2.5" fill="none"
+                        stroke-dasharray="515.2" stroke-dashoffset="515.2" stroke-linecap="round" class="transition-all duration-100 ease-out"></circle>
+            </svg>
+
+            <!-- Inner Logo container -->
+            <div class="relative z-10 w-44 h-44 flex items-center justify-center bg-black/40 backdrop-blur-md rounded-full border border-white/5 shadow-2xl overflow-hidden group">
+                <img src="public/assets/images/eat-fit-logo.png" alt="Eat Fit Logo" class="h-24 w-auto object-contain opacity-0 scale-90 transition-all duration-1000 ease-out" id="preloader-logo">
+            </div>
+
+            <!-- Tiny floating orbital dots for premium accent -->
+            <div class="absolute w-full h-full animate-[spin_20s_linear_infinite] pointer-events-none">
+                <div class="absolute top-4 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-gold/40 rounded-full filter blur-[1px]"></div>
+            </div>
+        </div>
+
+        <!-- Cinematic text block -->
+        <div class="mt-12 flex flex-col items-center gap-3 relative z-10">
+            <p class="text-gold font-sans font-semibold text-[10px] tracking-[0.5em] uppercase opacity-70">Eat Fit Atelier</p>
+            <div class="h-4 overflow-hidden flex flex-col items-center">
+                <span id="preloader-text" class="text-white/60 font-sans text-[11px] tracking-[0.25em] uppercase">Ecosystem Calibration</span>
+            </div>
+            <span id="preloader-pct" class="text-gold/90 font-mono text-sm tracking-widest font-light mt-1">0%</span>
+        </div>
+    </div>
+
+
+    <!-- CUSTOM CURSOR (Precision Reticle) -->
+    <div id="custom-cursor" class="fixed top-0 left-0 w-10 h-10 pointer-events-none z-[9999] transform -translate-x-1/2 -translate-y-1/2 transition-transform duration-75 ease-out flex items-center justify-center mix-blend-difference">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="white" stroke-width="1.5" id="cursor-svg" class="transition-all duration-300">
+            <line x1="16" y1="0" x2="16" y2="10" class="cursor-line"></line>
+            <line x1="16" y1="22" x2="16" y2="32" class="cursor-line"></line>
+            <line x1="0" y1="16" x2="10" y2="16" class="cursor-line"></line>
+            <line x1="22" y1="16" x2="32" y2="16" class="cursor-line"></line>
+            <circle cx="16" cy="16" r="2" fill="white"></circle>
+        </svg>
+    </div>
+
+    <!-- MODAL -->
+    <div id="info-modal" class="fixed inset-0 z-[5000] bg-black/95 backdrop-blur-2xl flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
+        <div class="max-w-2xl w-full p-10 relative bg-surface border border-borderSubtle rounded-none shadow-2xl transform translate-y-10 transition-transform duration-500" id="modal-content">
+            <button id="close-modal" class="absolute top-6 right-6 text-textMuted hover:text-white transition-colors cursor-hover">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <p class="text-gold font-sans text-xs tracking-widest mb-4 font-semibold uppercase" id="modal-tag">01 — DETAIL</p>
+            <h2 class="text-4xl md:text-5xl font-serif font-medium mb-6" id="modal-title">Detailed View</h2>
+            <p class="text-textMuted font-light leading-relaxed mb-8 text-lg" id="modal-desc">Comprehensive breakdown of this specific stage in the engineering process.</p>
+            <div class="w-full h-64 md:h-96 overflow-hidden relative cursor-hover border border-borderSubtle">
+                <img src="" id="modal-img" class="w-full h-full object-cover">
+            </div>
+        </div>
+    </div>
+
+    <!-- SCROLL TO TOP BUTTON -->
+    <button id="scroll-to-top" class="fixed bottom-8 right-8 z-[90] bg-white text-black p-4 rounded-none opacity-0 translate-y-10 pointer-events-none transition-all duration-500 cursor-hover hover:bg-gold hover:text-white border border-transparent shadow-2xl">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+    </button>
+
+    <!-- NAVIGATION -->
+    <nav class="fixed top-0 left-0 w-full z-[1000] transition-all duration-500" id="navbar">
+        <div class="absolute inset-0 bg-black backdrop-blur-xl border-b border-borderSubtle transition-all duration-500" id="nav-bg"></div>
+        <div class="relative w-full max-w-[1600px] mx-auto px-6 h-24 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="#" class="flex items-center cursor-hover nav-link">
+                <img src="public/assets/images/eat-fit-logo.png" alt="Eat Fit Logo" class="h-12 md:h-20 w-auto transition-all duration-300">
+            </a>
+
+            <!-- Desktop Links -->
+            <div class="hidden md:flex gap-12 text-xs font-semibold tracking-widest text-textMuted uppercase font-sans">
+                <a href="#hero" class="hover:text-textMain transition-colors cursor-hover nav-link">Home</a>
+                <a href="#cinematic-section" class="hover:text-textMain transition-colors cursor-hover nav-link">Vision</a>
+                <a href="#engineering" class="hover:text-textMain transition-colors cursor-hover nav-link">Engineering</a>
+                <a href="#quote-section" class="hover:text-textMain transition-colors cursor-hover nav-link">Story</a>
+                <a href="#contact" class="hover:text-textMain transition-colors cursor-hover nav-link">Contact</a>
+            </div>
+
+            <!-- Desktop CTA + Mobile Hamburger -->
+            <div class="flex items-center gap-4">
+                <button class="hidden md:block bg-white text-black px-8 py-3 rounded-none text-xs font-bold tracking-widest uppercase hover:bg-gold hover:text-white transition-colors cursor-hover" onclick="lenis.scrollTo('#contact', {offset:-100})">
+                    Pre-Order
+                </button>
+                <!-- Hamburger (mobile only) -->
+                <button id="hamburger-btn" class="md:hidden flex flex-col justify-center items-center w-10 h-10 gap-[6px] cursor-hover z-[110] relative" aria-label="Toggle menu">
+                    <span class="ham-line block w-7 h-[1.5px] bg-white transition-all duration-300"></span>
+                    <span class="ham-line block w-7 h-[1.5px] bg-white transition-all duration-300"></span>
+                    <span class="ham-line block w-5 h-[1.5px] bg-white transition-all duration-300"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu" class="md:hidden fixed inset-0 top-0 left-0 w-full h-screen bg-black z-[100] flex flex-col items-center justify-center gap-10 opacity-0 pointer-events-none transition-all duration-500 translate-y-[-20px]">
+            <a href="#hero"          class="mobile-nav-link text-4xl font-serif font-bold text-white hover:text-gold transition-colors cursor-hover nav-link">Home</a>
+            <a href="#cinematic-section" class="mobile-nav-link text-4xl font-serif font-bold text-white hover:text-gold transition-colors cursor-hover nav-link">Vision</a>
+            <a href="#engineering"   class="mobile-nav-link text-4xl font-serif font-bold text-white hover:text-gold transition-colors cursor-hover nav-link">Engineering</a>
+            <a href="#quote-section" class="mobile-nav-link text-4xl font-serif font-bold text-white hover:text-gold transition-colors cursor-hover nav-link">Story</a>
+            <a href="#contact"       class="mobile-nav-link text-4xl font-serif font-bold text-white hover:text-gold transition-colors cursor-hover nav-link">Contact</a>
+            <button class="mt-6 bg-white text-black px-12 py-4 text-sm font-bold tracking-widest uppercase hover:bg-gold hover:text-white transition-colors cursor-hover" onclick="closeMobileMenu(); lenis.scrollTo('#contact',{offset:-100})">
+                Pre-Order
+            </button>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION (FULL SCREEN IMAGE) -->
+    <section class="relative w-full h-screen flex flex-col items-center justify-center overflow-hidden bg-base" id="hero">
+        
+        <!-- Full Screen Background Image -->
+        <div class="absolute inset-0 z-0 w-full h-full">
+            <img src="./public/assets/images/frames_old/00001.jpg" alt="Eat Fit Background" class="w-full h-full object-cover scale-[1.05]" id="hero-img">
+        </div>
+        
+        <!-- Aggressive Gradient Overlays for Extreme Text Legibility -->
+        <div class="absolute inset-0 z-10 bg-black/60"></div>
+        <div class="absolute inset-0 z-10 bg-gradient-to-b from-black/80 via-transparent to-black/90"></div>
+        <div class="absolute inset-0 z-10 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)]"></div>
+
+        <!-- Content -->
+        <div class="relative z-20 flex flex-col items-center justify-center w-full max-w-[1400px] mx-auto px-6 text-center h-full pt-20">
+            <h1 class="hero-title opacity-0 translate-y-10 text-4xl sm:text-6xl md:text-8xl lg:text-[9rem] leading-[1.05] font-serif font-bold mb-8 text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)] tracking-wide">
+                Fresh Fit <br>
+                <span class="text-gold">Reimagined.</span>
+            </h1>
+            <p class="hero-subtitle opacity-0 translate-y-10 text-base md:text-2xl text-textMain max-w-3xl font-light tracking-wide drop-shadow-[0_5px_15px_rgba(0,0,0,0.9)]">
+                Culinary preservation elevated to an art form. Eat Fit is not just storage; it is the ultimate ecosystem for your food.
+            </p>
+        </div>
+    </section>
+
+    <!-- CINEMATIC SCROLL STORY -->
+    <section id="cinematic-section" class="relative w-full bg-base">
+        
+        <!-- Pinned Canvas Container -->
+        <div id="canvas-pin" class="h-screen w-full sticky top-0 overflow-hidden z-0 cursor-hover">
+            <canvas id="sequence-canvas" class="w-full h-full object-cover"></canvas>
+            <div class="absolute inset-0 bg-black/40 pointer-events-none"></div>
+        </div>
+
+        <!-- Scrollable Content Over Canvas -->
+        <div class="relative z-10 w-full max-w-[1400px] mx-auto px-6 md:px-12 -mt-[100vh]">
+            
+            <div class="h-[50vh]"></div>
+
+            <div class="h-[150vh] flex items-center justify-start story-panel pointer-events-none">
+                <div class="max-w-xl bg-black/80 backdrop-blur-2xl p-6 sm:p-12 rounded-none border border-white/10 border-l-[4px] border-l-gold shadow-2xl transform transition-transform duration-700 pointer-events-auto cursor-hover slide-up-element">
+                    <p class="text-gold font-sans font-bold text-xs tracking-widest mb-4 uppercase">01 — Ingredients</p>
+                    <h2 class="text-3xl sm:text-4xl md:text-6xl font-serif font-bold mb-6 text-white drop-shadow-md">
+                        Untouched <span class="text-gold font-medium">Purity.</span>
+                    </h2>
+                    <p class="text-white/85 font-light leading-relaxed mb-10 text-base sm:text-lg drop-shadow-sm">
+                        <span class="text-gold font-medium">Suspended in time.</span> We preserve the cellular integrity of your ingredients before they ever make contact with the environment.
+                    </p>
+                    <button class="open-modal-btn text-xs font-bold tracking-widest uppercase border-b-2 border-gold text-gold pb-2 cursor-hover hover:text-white hover:border-white transition-colors" data-tag="01 — INGREDIENTS" data-title="Untouched Purity" data-desc="The floating ingredients showcase our zero-gravity preservation concept, isolating food from oxidative stress and mechanical damage." data-img="./public/assets/images/frames_old/00100.jpg">View Details</button>
+                </div>
+            </div>
+
+            <div class="h-[150vh] flex items-center justify-end story-panel pointer-events-none">
+                <div class="max-w-xl bg-black/80 backdrop-blur-2xl p-6 sm:p-12 rounded-none border border-white/10 border-l-[4px] border-l-gold shadow-2xl transform transition-transform duration-700 pointer-events-auto cursor-hover slide-up-element">
+                    <p class="text-gold font-sans font-bold text-xs tracking-widest mb-4 uppercase">02 — Architecture</p>
+                    <h2 class="text-3xl sm:text-4xl md:text-6xl font-serif font-bold mb-6 text-gold drop-shadow-md">
+                        Absolute Precision.
+                    </h2>
+                    <p class="text-[#d4c3a3] font-light leading-relaxed mb-10 text-base sm:text-lg drop-shadow-sm">
+                        <span class="text-white font-semibold">Every millimeter is calculated.</span> The internal geometry actively prevents thermal bridging and condensation buildup.
+                    </p>
+                    <button class="open-modal-btn text-xs font-bold tracking-widest uppercase border-b-2 border-gold text-gold pb-2 cursor-hover hover:text-white hover:border-white transition-colors" data-tag="02 — ARCHITECTURE" data-title="Absolute Precision" data-desc="The internal structure uses a honeycomb matrix that distributes weight and maintains thermal equilibrium across all compartments." data-img="./public/assets/images/frames_old/00350.jpg">View Details</button>
+                </div>
+            </div>
+
+            <div class="h-[150vh] flex items-center justify-start story-panel pointer-events-none">
+                <div class="max-w-xl bg-black/80 backdrop-blur-2xl p-6 sm:p-12 rounded-none border border-white/10 border-l-[4px] border-l-gold shadow-2xl transform transition-transform duration-700 pointer-events-auto cursor-hover slide-up-element">
+                    <p class="text-white/60 font-sans font-bold text-xs tracking-widest mb-4 uppercase">03 — Composition</p>
+                    <h2 class="text-3xl sm:text-4xl md:text-6xl font-serif font-bold mb-6 text-white drop-shadow-md">
+                        Flawless Assembly.
+                    </h2>
+                    <p class="text-white font-light leading-relaxed mb-10 text-base sm:text-lg drop-shadow-sm">
+                        <span class="text-white font-semibold">The meal, perfectly situated.</span> The structural integrity holds everything exactly as the chef intended, maintaining textures.
+                    </p>
+                    <button class="open-modal-btn text-xs font-bold tracking-widest uppercase border-b-2 border-white text-white pb-2 cursor-hover hover:text-gold hover:border-gold transition-colors" data-tag="03 — COMPOSITION" data-title="Flawless Assembly" data-desc="Watch as distinct components are layered without crushing. Our dynamic partition system adapts to the volume of your food." data-img="./public/assets/images/frames_old/00550.jpg">View Details</button>
+                </div>
+            </div>
+
+            <div class="h-[150vh] flex items-center justify-end story-panel pointer-events-none">
+                <div class="max-w-xl bg-black/80 backdrop-blur-2xl p-6 sm:p-12 rounded-none border border-white/10 border-l-[4px] border-l-gold shadow-2xl transform transition-transform duration-700 pointer-events-auto cursor-hover slide-up-element">
+                    <p class="text-gold font-sans font-bold text-xs tracking-widest mb-4 uppercase">04 — Isolation</p>
+                    <h2 class="text-3xl sm:text-4xl md:text-6xl font-serif font-bold mb-6 text-white drop-shadow-md">
+                        The Final <span class="text-gold font-medium">Seal.</span>
+                    </h2>
+                    <p class="text-white/85 font-light leading-relaxed mb-10 text-base sm:text-lg drop-shadow-sm">
+                        <span class="text-gold font-medium">A microscopic vacuum is formed.</span> Air and moisture are banished, locking the environment into a state of stasis.
+                    </p>
+                    <button class="open-modal-btn text-xs font-bold tracking-widest uppercase border-b-2 border-gold text-gold pb-2 cursor-hover hover:text-white hover:border-white transition-colors" data-tag="04 — ISOLATION" data-title="The Final Seal" data-desc="The lid's perimeter houses a dual-extruded silicone gasket that creates an airtight, watertight seal automatically upon closing." data-img="./public/assets/images/frames_old/00800.jpg">View Details</button>
+                </div>
+            </div>
+
+            <div class="h-[100vh] flex items-center justify-center story-panel pointer-events-none">
+                <div class="text-center bg-black/70 backdrop-blur-2xl p-8 sm:p-20 rounded-none border border-white/10 border-l-[4px] border-l-gold shadow-[0_0_150px_rgba(191,166,122,0.15)] w-full max-w-5xl pointer-events-auto cursor-hover slide-up-element">
+                    <h2 class="text-4xl sm:text-6xl md:text-9xl font-serif font-bold mb-8 text-white tracking-widest">EAT FIT</h2>
+                    <p class="text-xl sm:text-2xl md:text-3xl text-white/90 font-light max-w-3xl mx-auto drop-shadow-md">The pinnacle of food preservation. Ready for your journey.</p>
+                </div>
+            </div>
+
+
+        </div>
+    </section>
+
+    <!-- BENTO GRID DETAILS -->
+    <section id="engineering" class="w-full py-32 bg-white border-t border-b border-black/10 overflow-hidden">
+        <div class="max-w-[1400px] mx-auto px-6">
+            
+            <div class="flex flex-col lg:flex-row justify-between items-end mb-16 gap-10 slide-up-element opacity-0 translate-y-10">
+                <div>
+                    <h2 class="text-5xl md:text-7xl font-serif font-bold leading-[1.1] text-black">
+                        Engineered to <br>outlast.
+                    </h2>
+                </div>
+                <div class="max-w-xl">
+                    <p class="text-[#333333] font-light leading-relaxed text-xl">
+                        We abandoned traditional manufacturing. Eat Fit is machined, anodized, and sealed using techniques reserved for the aerospace industry.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Grid Layout -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-fr">
+                
+                <!-- Large Image Block -->
+                <div class="md:col-span-8 bg-black rounded-none overflow-hidden relative group min-h-[500px] md:min-h-[700px] cursor-hover border border-black/10 shadow-lg slide-up-element opacity-0 translate-y-10">
+                    <div class="absolute inset-0 w-full h-full">
+                        <img src="./public/assets/images/frames_old/00200.jpg" alt="Thermal Core" class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-[2s] ease-out">
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90 pointer-events-none"></div>
+                    <div class="absolute bottom-12 left-12 right-12 pointer-events-none">
+                        <p class="text-gold font-sans font-bold text-sm tracking-widest mb-4 uppercase">Feature 01</p>
+                        <h3 class="text-4xl font-serif font-bold mb-4 text-white">Thermal Core</h3>
+                        <p class="text-textMain font-light max-w-lg text-lg leading-relaxed drop-shadow-md">Dual-wall vacuum insulation maintains exact temperatures for 24 hours, defying external conditions entirely.</p>
+                    </div>
+                </div>
+
+                <!-- Vertical Stack -->
+                <div class="md:col-span-4 flex flex-col gap-6">
+                    <!-- Text Block -->
+                    <div class="flex-1 bg-[#f8f8fa] rounded-none p-12 flex flex-col justify-center border border-black/10 hover:border-gold/60 transition-all duration-300 shadow-md cursor-hover slide-up-element opacity-0 translate-y-10 eng-text-card">
+                        <i data-lucide="shield-check" class="w-10 h-10 text-gold mb-8"></i>
+                        <h3 class="text-3xl font-serif font-bold mb-4 text-black">Hermetic Integrity</h3>
+                        <p class="text-[#333333] font-light leading-relaxed text-base">
+                            Our proprietary silicone composite ring creates a seal so tight, it withstands extreme atmospheric pressure changes without a drop escaping.
+                        </p>
+                    </div>
+                    
+                    <!-- Image Block -->
+                    <div class="flex-[1.5] bg-[#f8f8fa] rounded-none overflow-hidden relative group cursor-hover border border-black/10 shadow-md slide-up-element opacity-0 translate-y-10">
+                        <!-- Used a very dynamic frame to ensure it doesn't look empty -->
+                        <img src="./public/assets/images/frames_old/00750.jpg" alt="Anodized Finish" class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-[2s] ease-out">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90 pointer-events-none"></div>
+                        <div class="absolute bottom-10 left-10 pointer-events-none">
+                            <p class="text-gold font-sans font-bold text-xs tracking-widest mb-3 uppercase">Material</p>
+                            <h3 class="text-3xl font-serif font-bold text-white">Anodized Finish</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Horizontal Image -->
+                <div class="md:col-span-12 bg-[#f8f8fa] rounded-none overflow-hidden relative group min-h-[400px] cursor-hover border border-black/10 mt-2 shadow-lg slide-up-element opacity-0 translate-y-10">
+                    <!-- Dynamic assembly frame -->
+                    <img src="./public/assets/images/frames_old/00880.jpg" alt="Fresh Fit Profile" class="w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-[2s] ease-out">
+                    <div class="absolute inset-0 bg-black/50 mix-blend-multiply pointer-events-none"></div>
+                    <div class="absolute inset-0 flex items-center justify-center text-center pointer-events-none">
+                        <h3 class="text-5xl md:text-7xl font-serif font-bold text-white tracking-widest drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]">The Fresh Fit Profile</h3>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SCROLL TEXT REVEAL SECTION -->
+    <section class="w-full bg-base border-t border-borderSubtle overflow-hidden" id="quote-section">
+        <div class="w-full px-8 md:px-16 py-32" id="quote-text-block">
+            <p class="scroll-reveal-line scroll-reveal-white font-serif font-bold leading-[1.05]" style="font-size: clamp(1.8rem, 5.5vw, 6.5rem); margin-bottom: -0.15em;">"Eat Fit isn't just a container.</p>
+            <p class="scroll-reveal-line scroll-reveal-gold font-serif font-bold leading-[1.05]" style="font-size: clamp(1.8rem, 5.5vw, 6.5rem); margin-bottom: -0.15em;">It is an uncompromising</p>
+            <p class="scroll-reveal-line scroll-reveal-white font-serif font-bold leading-[1.05]" style="font-size: clamp(1.8rem, 5.5vw, 6.5rem); margin-bottom: -0.15em;">statement — that what</p>
+            <p class="scroll-reveal-line scroll-reveal-gold font-serif font-bold leading-[1.05]" style="font-size: clamp(1.8rem, 5.5vw, 6.5rem); margin-bottom: -0.15em;">you consume deserves</p>
+            <p class="scroll-reveal-line scroll-reveal-white font-serif font-bold leading-[1.05]" style="font-size: clamp(1.8rem, 5.5vw, 6.5rem);">the highest respect."</p>
+        </div>
+    </section>
+
+
+    <!-- VIDEO SHOWCASE SECTION -->
+    <section class="w-full bg-base border-t border-borderSubtle overflow-hidden">
+        <!-- Label Row -->
+        <div class="max-w-[1400px] mx-auto px-6 pt-20 pb-10 flex flex-col md:flex-row justify-between items-end gap-6">
+            <div>
+                <p class="text-gold font-sans font-bold text-xs tracking-widest uppercase mb-4">In Motion</p>
+                <h2 class="text-5xl md:text-7xl font-serif font-bold text-white leading-tight">Crafted.<br><span class="text-textMuted font-light">In every detail.</span></h2>
+            </div>
+            <p class="text-textMuted font-light text-lg max-w-md leading-relaxed">
+                Watch precision engineering come alive — from raw material to the perfect seal, every moment is intentional.
+            </p>
+        </div>
+
+        <!-- Full-Width Looping Video -->
+        <div class="relative w-full" style="aspect-ratio: 16/9;">
+            <video
+                autoplay
+                loop
+                muted
+                playsinline
+                class="w-full h-full object-cover"
+                poster="./public/assets/images/frames_old/00001.jpg">
+                <source src="./public/assets/videos/video-loop.mp4" type="video/mp4">
+            </video>
+            <!-- Subtle gradient overlays for cinematic feel -->
+            <div class="absolute inset-0 bg-gradient-to-t from-base/60 via-transparent to-base/30 pointer-events-none"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-base/20 via-transparent to-base/20 pointer-events-none"></div>
+        </div>
+    </section>
+
+    <!-- CONTACT US SECTION -->
+    <section id="contact" class="w-full py-32 bg-white border-t border-black/10 overflow-hidden">
+        <div class="max-w-[1400px] mx-auto px-6 flex flex-col lg:flex-row gap-20 justify-between slide-up-element opacity-0 translate-y-10">
+            <div class="flex-1">
+                <p class="text-gold font-sans font-bold text-sm tracking-widest mb-6 uppercase">Connect</p>
+                <h2 class="text-3xl sm:text-5xl md:text-7xl font-serif font-bold text-black mb-10 leading-tight">Let's start a conversation.</h2>
+                <p class="text-[#333333] font-light leading-relaxed max-w-lg mb-12 text-xl contact-desc">
+                    For bespoke orders, corporate gifting, or press inquiries, please reach out. Our concierge team is available 24/7.
+                </p>
+                <div class="space-y-6">
+                    <a href="mailto:concierge@eatfit.com" class="block text-black font-serif tracking-wider sm:tracking-widest cursor-hover text-base sm:text-lg md:text-2xl hover:text-gold transition-colors break-all">concierge@eatfit.com</a>
+                    <a href="tel:+18005550199" class="block text-[#333333] font-sans text-xl font-light hover:text-black transition-colors cursor-hover">+1 (800) 555-0199</a>
+                </div>
+            </div>
+            
+            <div class="flex-[1.2] w-full bg-[#f8f8fa] p-6 sm:p-12 border border-black/10 shadow-xl">
+                <form class="flex flex-col gap-10 w-full" onsubmit="event.preventDefault(); alert('Inquiry sent successfully. Our concierge will contact you shortly.');">
+                    <div class="relative group cursor-hover">
+                        <input type="text" id="name" class="w-full bg-transparent border-b border-black/20 text-black font-sans text-lg py-4 focus:outline-none focus:border-gold transition-colors peer" placeholder=" " required>
+                        <label for="name" class="absolute left-0 top-4 text-[#444444] font-sans font-bold text-sm tracking-widest uppercase transition-all duration-300 peer-focus:-translate-y-8 peer-focus:text-xs peer-focus:text-gold peer-[:not(:placeholder-shown)]:-translate-y-8 peer-[:not(:placeholder-shown)]:text-xs cursor-text pointer-events-none">Full Name</label>
+                    </div>
+                    
+                    <div class="relative group cursor-hover">
+                        <input type="email" id="email" class="w-full bg-transparent border-b border-black/20 text-black font-sans text-lg py-4 focus:outline-none focus:border-gold transition-colors peer" placeholder=" " required>
+                        <label for="email" class="absolute left-0 top-4 text-[#444444] font-sans font-bold text-sm tracking-widest uppercase transition-all duration-300 peer-focus:-translate-y-8 peer-focus:text-xs peer-focus:text-gold peer-[:not(:placeholder-shown)]:-translate-y-8 peer-[:not(:placeholder-shown)]:text-xs cursor-text pointer-events-none">Email Address</label>
+                    </div>
+                    
+                    <div class="relative group cursor-hover">
+                        <textarea id="message" rows="4" class="w-full bg-transparent border-b border-black/20 text-black font-sans text-lg py-4 focus:outline-none focus:border-gold transition-colors peer resize-none" placeholder=" " required></textarea>
+                        <label for="message" class="absolute left-0 top-4 text-[#444444] font-sans font-bold text-sm tracking-widest uppercase transition-all duration-300 peer-focus:-translate-y-8 peer-focus:text-xs peer-focus:text-gold peer-[:not(:placeholder-shown)]:-translate-y-8 peer-[:not(:placeholder-shown)]:text-xs cursor-text pointer-events-none">Message</label>
+                    </div>
+                    
+                    <button type="submit" class="mt-4 self-start bg-black text-white border border-black px-12 py-5 rounded-none text-sm font-bold tracking-widest uppercase hover:bg-gold hover:text-white hover:border-gold transition-all duration-500 cursor-hover flex items-center gap-4 group">
+                        Send Inquiry
+                        <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-2 transition-transform"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA BANNER -->
+    <section class="relative w-full py-48 bg-base flex flex-col items-center justify-center border-t border-borderSubtle overflow-hidden">
+        
+        <!-- Background Image -->
+        <div class="absolute inset-0 z-0">
+            <img id="cta-bg" src="./public/assets/images/frames_old/00950.jpg" alt="Final Shot" class="w-full h-full object-cover opacity-50">
+            <div class="absolute inset-0 bg-gradient-to-b from-base via-base/80 to-base"></div>
+        </div>
+
+        <div class="relative z-10 flex flex-col items-center px-6 text-center cursor-hover">
+            <div class="text-gold font-sans font-bold text-sm tracking-widest mb-6 uppercase">Reserve Yours</div>
+            <h2 class="text-6xl md:text-8xl font-serif font-bold mb-12 text-white drop-shadow-xl">Experience Eat Fit.</h2>
+            
+            <button class="group relative px-16 py-6 bg-white text-black hover:bg-gold hover:text-white transition-colors duration-500 rounded-none flex items-center gap-4 overflow-hidden cursor-hover" onclick="document.getElementById('contact').scrollIntoView({behavior: 'smooth'})">
+                <span class="relative z-10 text-base tracking-widest uppercase font-bold">Pre-Order Now</span>
+                <i data-lucide="arrow-right" class="w-6 h-6 relative z-10 transform group-hover:translate-x-2 transition-transform duration-300"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="w-full bg-[#0a0907] border-t border-borderSubtle pt-14 pb-0">
+        <div class="max-w-[1400px] mx-auto px-6">
+
+            <!-- Top Row: Brand + 2 Right Columns -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 pb-10 border-b border-borderSubtle">
+
+                <!-- Brand Column -->
+                <div class="md:col-span-5">
+                    <div class="mb-6">
+                        <img src="public/assets/images/eat-fit-logo.png" alt="Eat Fit Logo" class="h-12 md:h-20 w-auto mb-6 cursor-hover" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+                    </div>
+                    <p class="text-textMuted font-light leading-relaxed text-base max-w-xs mb-8">
+                        Culinary preservation elevated to an art form. Engineered for those who refuse to compromise on quality.
+                    </p>
+                    <!-- Social Icons -->
+                    <div class="flex gap-4">
+                        <!-- Instagram -->
+                        <a href="#" aria-label="Instagram" class="w-10 h-10 border border-borderSubtle flex items-center justify-center text-textMuted hover:border-gold hover:text-gold transition-all duration-300 cursor-hover">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                        </a>
+                        <!-- X / Twitter -->
+                        <a href="#" aria-label="Twitter" class="w-10 h-10 border border-borderSubtle flex items-center justify-center text-textMuted hover:border-gold hover:text-gold transition-all duration-300 cursor-hover">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        </a>
+                        <!-- LinkedIn -->
+                        <a href="#" aria-label="LinkedIn" class="w-10 h-10 border border-borderSubtle flex items-center justify-center text-textMuted hover:border-gold hover:text-gold transition-all duration-300 cursor-hover">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                        </a>
+                        <!-- YouTube -->
+                        <a href="#" aria-label="YouTube" class="w-10 h-10 border border-borderSubtle flex items-center justify-center text-textMuted hover:border-gold hover:text-gold transition-all duration-300 cursor-hover">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.95C18.88 4 12 4 12 4s-6.88 0-8.59.47a2.78 2.78 0 0 0-1.95 1.95A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.95C5.12 20 12 20 12 20s6.88 0 8.59-.47a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" stroke="none"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right Columns -->
+                <div class="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-8">
+
+                    <!-- Navigate -->
+                    <div>
+                        <p class="text-white font-sans font-bold text-sm tracking-widest uppercase mb-6">Navigate</p>
+                        <ul class="space-y-4">
+                            <li><a href="#hero" class="text-textMuted hover:text-gold font-light text-base tracking-wide transition-colors cursor-hover nav-link">Home</a></li>
+                            <li><a href="#cinematic-section" class="text-textMuted hover:text-gold font-light text-base tracking-wide transition-colors cursor-hover nav-link">Vision</a></li>
+                            <li><a href="#engineering" class="text-textMuted hover:text-gold font-light text-base tracking-wide transition-colors cursor-hover nav-link">Engineering</a></li>
+                            <li><a href="#quote-section" class="text-textMuted hover:text-gold font-light text-base tracking-wide transition-colors cursor-hover nav-link">Story</a></li>
+                            <li><a href="#contact" class="text-textMuted hover:text-gold font-light text-base tracking-wide transition-colors cursor-hover nav-link">Contact</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Manifesto + Newsletter -->
+                    <div class="flex flex-col justify-between gap-8">
+                        <div>
+                            <p class="text-white font-sans font-bold text-sm tracking-widest uppercase mb-6">Stay Informed</p>
+                            <p class="text-textMuted font-light text-base leading-relaxed mb-5">Early access and exclusive updates from the atelier.</p>
+                            <form class="flex flex-col gap-3" onsubmit="event.preventDefault(); this.querySelector('input').value=''; this.querySelector('p').classList.remove('hidden');">
+                                <div class="relative border-b border-borderSubtle focus-within:border-gold transition-colors">
+                                    <input type="email" placeholder="your@email.com" required class="w-full bg-transparent text-white font-sans text-base py-2 pr-10 focus:outline-none placeholder-textMuted/50 cursor-hover">
+                                    <button type="submit" class="absolute right-0 top-1/2 -translate-y-1/2 text-textMuted hover:text-gold transition-colors cursor-hover">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                                    </button>
+                                </div>
+                                <p class="hidden text-gold font-sans text-xs tracking-widest uppercase">Subscribed.</p>
+                            </form>
+                        </div>
+                        <!-- Minimal manifesto line -->
+                        <p class="font-serif italic text-base leading-relaxed border-l-2 border-gold/30 pl-4" style="color: #cccccc;">
+                            "Precision is not a feature.<br>It is the baseline."
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Legal Row -->
+            <div class="py-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[13px] font-sans font-bold tracking-widest uppercase text-textMuted">
+                <div>&copy; 2026 Eat Fit Corporation. All rights reserved.</div>
+                <div class="flex gap-8">
+                    <a href="#" class="hover:text-gold transition-colors cursor-hover">Privacy Policy</a>
+                    <a href="#" class="hover:text-gold transition-colors cursor-hover">Terms of Use</a>
+                    <a href="#" class="hover:text-gold transition-colors cursor-hover">Cookie Policy</a>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.33/dist/lenis.min.js"></script>
+    
+    <script>lucide.createIcons();</script>
+    <script src="script.js"></script>
+</body>
+</html>

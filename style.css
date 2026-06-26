@@ -1,0 +1,99 @@
+/* style.css */
+
+/* Lenis smooth scroll recommended styles */
+html.lenis {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Base Resets */
+body {
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+canvas {
+  display: block;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+
+/* Custom Selection */
+::selection {
+  background-color: #Bfa67a;
+  color: #000;
+}
+
+/* Elegant scrollbar (optional for non-lenis devices/fallback) */
+::-webkit-scrollbar {
+  width: 18px;
+}
+::-webkit-scrollbar-track {
+  background: #000;
+}
+::-webkit-scrollbar-thumb {
+  background: #666666;
+  border-radius: 20px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ffffff;
+}
+
+/* Ensure system pointer cursor is visible on hover */
+.cursor-hover, a, button, [role="button"], input, textarea, select {
+  cursor: pointer !important;
+}
+
+/* Scroll Text Reveal — gradient clip technique */
+.scroll-reveal-line {
+  background-size: 200% 100%;
+  background-position-x: 100%;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  display: block;
+}
+
+/* White variant (odd lines) */
+.scroll-reveal-white {
+  background-image: linear-gradient(
+    to right,
+    #ffffff 50%,
+    #2a2a2a 50%
+  );
+}
+
+/* Gold variant (even lines) */
+.scroll-reveal-gold {
+  background-image: linear-gradient(
+    to right,
+    #Bfa67a 50%,
+    #2a2a2a 50%
+  );
+}
+
+/* Mobile and Tablet viewports: disable custom cursor */
+@media (max-w: 1024px) {
+  #custom-cursor {
+    display: none !important;
+  }
+}
+
