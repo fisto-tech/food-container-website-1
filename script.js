@@ -183,16 +183,60 @@ function initHeroAnimations() {
     .to(".hero-subtitle", { y: 0, opacity: 1, duration: 1.5, ease: "power4.out" }, "-=1.2");
 
   // Parallax the huge full screen background image
-  gsap.to("#hero-img", {
-    yPercent: 15,
-    ease: "none",
-    scrollTrigger: {
-      trigger: "#hero",
-      start: "top top",
-      end: "bottom top",
-      scrub: true
+  gsap.fromTo("#hero-parallax-wrapper", 
+    { yPercent: 0 },
+    {
+      yPercent: 15,
+      ease: "none",
+      scrollTrigger: {
+        trigger: "#hero",
+        start: "top top",
+        end: "bottom top",
+        scrub: true
+      }
     }
-  });
+  );
+}
+
+// Global scope for frames
+const canvasImages = [];
+const frameCount = 479;
+const isMobileSeq = window.innerWidth < 768;
+const stepSeq = isMobileSeq ? 3 : 1;
+const totalFramesToLoad = Math.ceil(frameCount / stepSeq);
+
+function preloadFrames(onProgress, onComplete) {
+    let loaded = 0;
+    let hasCompleted = false;
+    const currentFrame = index => `./public/assets/images/frames/${(index + 1).toString().padStart(5, '0')}.webp`;
+    
+    for (let i = 0; i < frameCount; i += stepSeq) {
+        const img = new Image();
+        img.src = currentFrame(i);
+        
+        const handleLoad = () => {
+            loaded++;
+            if (onProgress && !hasCompleted) onProgress(loaded / totalFramesToLoad);
+            if (loaded === totalFramesToLoad && onComplete && !hasCompleted) {
+                hasCompleted = true;
+                onComplete();
+            }
+        };
+        
+        if (img.complete) {
+            handleLoad();
+        } else {
+            img.onload = handleLoad;
+            img.onerror = handleLoad;
+        }
+        
+        canvasImages.push(img);
+    }
+    
+    if (loaded === totalFramesToLoad && onComplete && !hasCompleted) {
+        hasCompleted = true;
+        onComplete();
+    }
 }
 
 // Canvas Image Sequence for Cinematic Story
@@ -204,30 +248,21 @@ function initSequence() {
   canvas.width = 1920;
   canvas.height = 1080;
 
-  const frameCount = 479;
-  const currentFrame = index => `./public/assets/images/frames/${(index + 1).toString().padStart(5, '0')}.webp`;
-
-  const isMobile = window.innerWidth < 768;
-  const step = isMobile ? 3 : 1; // Preload every 3rd frame on mobile (160 frames) to save memory/CPU, every frame on desktop (479 frames)
-
-  const images = [];
   const seq = { frame: 0 };
 
-  const img = new Image();
-  img.src = currentFrame(0);
-  img.onload = () => {
-    context.drawImage(img, 0, 0, canvas.width, canvas.height);
-  };
-
-  // Only load the frames we actually need based on step to prevent mobile lag
-  for (let i = 0; i < frameCount; i += step) {
-    const frameImg = new Image();
-    frameImg.src = currentFrame(i);
-    images.push(frameImg);
+  if (canvasImages.length > 0) {
+      const firstImg = canvasImages[0];
+      if (firstImg.complete && firstImg.naturalWidth > 0) {
+          context.drawImage(firstImg, 0, 0, canvas.width, canvas.height);
+      } else {
+          firstImg.addEventListener('load', () => {
+              context.drawImage(firstImg, 0, 0, canvas.width, canvas.height);
+          });
+      }
   }
 
   gsap.to(seq, {
-    frame: images.length - 1,
+    frame: canvasImages.length - 1,
     snap: "frame",
     ease: "none",
     scrollTrigger: {
@@ -241,7 +276,7 @@ function initSequence() {
 
   function render() {
     try {
-      const activeImg = images[seq.frame];
+      const activeImg = canvasImages[Math.round(seq.frame)];
       if (activeImg && activeImg.complete && activeImg.naturalWidth > 0) {
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.drawImage(activeImg, 0, 0, canvas.width, canvas.height);
@@ -614,18 +649,21 @@ function initScrollTextReveal() {
 
 // CTA Parallax Background
 function initCTA() {
-  const ctaBg = document.getElementById('cta-bg');
+  const ctaBg = document.getElementById('cta-parallax-wrapper');
   if(ctaBg) {
-    gsap.to(ctaBg, {
-      yPercent: 20,
-      ease: "none",
-      scrollTrigger: {
-        trigger: ctaBg.parentElement.parentElement,
-        start: "top bottom",
-        end: "bottom top",
-        scrub: true
+    gsap.fromTo(ctaBg, 
+      { yPercent: 0 },
+      {
+        yPercent: 20,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ctaBg.parentElement.parentElement,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: true
+        }
       }
-    });
+    );
   }
 }
 
@@ -652,13 +690,16 @@ function initPreloader() {
   // ── Session skip: if already shown this session, hide immediately ──
   if (sessionStorage.getItem('preloader_done') === '1') {
     preloader.style.display = 'none';
-    lenis.start();
-    initHeroAnimations();
-    initSequence();
-    initScrollTextReveal();
-    initAdvancedScrollAnimations();
-    initCTA();
-    ScrollTrigger.refresh();
+    preloadFrames(); // Still preload in background to populate canvasImages
+    setTimeout(() => {
+        lenis.start();
+        initHeroAnimations();
+        initSequence();
+        initScrollTextReveal();
+        initAdvancedScrollAnimations();
+        initCTA();
+        ScrollTrigger.refresh();
+    }, 50);
     return;
   }
 
@@ -673,58 +714,60 @@ function initPreloader() {
     );
   }
 
-  let progress = 0;
-  const interval = setInterval(() => {
-    progress += Math.floor(Math.random() * 15) + 5;
-    if (progress > 100) progress = 100;
+  preloadFrames(
+    (progressFraction) => {
+        let progress = Math.floor(progressFraction * 100);
+        if (progress > 100) progress = 100;
 
-    // Update progress circle SVG dashoffset (515.2 circumference)
-    if (circle) {
-      const offset = 515.2 - (progress / 100) * 515.2;
-      gsap.to(circle, { strokeDashoffset: offset, duration: 0.3, ease: 'power1.out' });
+        // Update progress circle SVG dashoffset (515.2 circumference)
+        if (circle) {
+            const offset = 515.2 - (progress / 100) * 515.2;
+            gsap.to(circle, { strokeDashoffset: offset, duration: 0.3, ease: 'power1.out' });
+        }
+        if (pct) pct.textContent = `${progress}%`;
+
+        // Find and update current culinary loading phrase
+        if (text) {
+            const currentPhrase = loadingPhrases.find(p => progress <= p.threshold);
+            if (currentPhrase && text.textContent !== currentPhrase.text) {
+                // Subtle fade transition for the text
+                gsap.to(text, {
+                    opacity: 0,
+                    duration: 0.15,
+                    onComplete: () => {
+                        text.textContent = currentPhrase.text;
+                        gsap.to(text, { opacity: 1, duration: 0.15 });
+                    }
+                });
+            }
+        }
+    },
+    () => {
+        setTimeout(() => {
+            gsap.to(preloader, {
+                opacity: 0,
+                duration: 1,
+                ease: 'power2.inOut',
+                onComplete: () => {
+                    preloader.style.display = 'none';
+                    sessionStorage.setItem('preloader_done', '1'); // mark as shown
+                    
+                    setTimeout(() => {
+                        lenis.start();
+
+                        initHeroAnimations();
+                        initSequence();
+                        initScrollTextReveal();
+                        initAdvancedScrollAnimations();
+                        initCTA();
+
+                        ScrollTrigger.refresh();
+                    }, 50);
+                }
+            });
+        }, 500);
     }
-    if (pct) pct.textContent = `${progress}%`;
-
-    // Find and update current culinary loading phrase
-    if (text) {
-      const currentPhrase = loadingPhrases.find(p => progress <= p.threshold);
-      if (currentPhrase && text.textContent !== currentPhrase.text) {
-        // Subtle fade transition for the text
-        gsap.to(text, {
-          opacity: 0,
-          duration: 0.15,
-          onComplete: () => {
-            text.textContent = currentPhrase.text;
-            gsap.to(text, { opacity: 1, duration: 0.15 });
-          }
-        });
-      }
-    }
-
-    if (progress === 100) {
-      clearInterval(interval);
-      setTimeout(() => {
-        gsap.to(preloader, {
-          opacity: 0,
-          duration: 1,
-          ease: 'power2.inOut',
-          onComplete: () => {
-            preloader.style.display = 'none';
-            sessionStorage.setItem('preloader_done', '1'); // mark as shown
-            lenis.start();
-
-            initHeroAnimations();
-            initSequence();
-            initScrollTextReveal();
-            initAdvancedScrollAnimations();
-            initCTA();
-
-            ScrollTrigger.refresh();
-          }
-        });
-      }, 500);
-    }
-  }, 150);
+  );
 }
 
 // Initialize all

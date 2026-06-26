@@ -28,6 +28,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Outfit:wght@200;300;400;500&display=swap" rel="stylesheet">
     
+    <!-- Preload Critical Background Images to prevent network queuing delays -->
+    <link rel="preload" href="./public/assets/images/frames_old/00001.jpg" as="image">
+    <link rel="preload" href="./public/assets/images/frames_old/00950.jpg" as="image">
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -58,7 +62,7 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body class="bg-base text-textMain font-sans overflow-x-hidden">
 
@@ -183,8 +187,10 @@
     <section class="relative w-full h-screen flex flex-col items-center justify-center overflow-hidden bg-base" id="hero">
         
         <!-- Full Screen Background Image -->
-        <div class="absolute inset-0 z-0 w-full h-full">
-            <img src="./public/assets/images/frames_old/00001.jpg" alt="Eat Fit Background" class="w-full h-full object-cover scale-[1.05]" id="hero-img">
+        <div class="absolute inset-0 z-0 w-full h-full overflow-hidden">
+            <div id="hero-parallax-wrapper" class="absolute -top-[10%] left-0 w-full h-[120%]">
+                <img src="./public/assets/images/frames_old/00001.jpg" alt="Eat Fit Background" class="w-full h-full object-cover">
+            </div>
         </div>
         
         <!-- Aggressive Gradient Overlays for Extreme Text Legibility -->
@@ -438,9 +444,11 @@
     <section class="relative w-full py-48 bg-base flex flex-col items-center justify-center border-t border-borderSubtle overflow-hidden">
         
         <!-- Background Image -->
-        <div class="absolute inset-0 z-0">
-            <img id="cta-bg" src="./public/assets/images/frames_old/00950.jpg" alt="Final Shot" class="w-full h-full object-cover opacity-50">
-            <div class="absolute inset-0 bg-gradient-to-b from-base via-base/80 to-base"></div>
+        <div class="absolute inset-0 z-0 overflow-hidden">
+            <div id="cta-parallax-wrapper" class="absolute -top-[15%] left-0 w-full h-[130%]">
+                <img src="./public/assets/images/frames_old/00950.jpg" alt="Final Shot" class="w-full h-full object-cover opacity-50">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-b from-base via-base/80 to-base pointer-events-none"></div>
         </div>
 
         <div class="relative z-10 flex flex-col items-center px-6 text-center cursor-hover">
@@ -548,6 +556,6 @@
     <script src="https://unpkg.com/@studio-freight/lenis@1.0.33/dist/lenis.min.js"></script>
     
     <script>lucide.createIcons();</script>
-    <script src="script.js"></script>
+    <script src="script.js?v=2"></script>
 </body>
 </html>
