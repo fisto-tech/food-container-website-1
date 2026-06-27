@@ -179,8 +179,39 @@ modal.addEventListener('click', (e) => {
 function initHeroAnimations() {
   const tl = gsap.timeline({ delay: 0.2 });
   
-  tl.to(".hero-title", { y: 0, opacity: 1, duration: 1.5, ease: "power4.out" })
-    .to(".hero-subtitle", { y: 0, opacity: 1, duration: 1.5, ease: "power4.out" }, "-=1.2");
+  tl.fromTo(".hero-title", 
+    { y: 40, opacity: 0 },
+    { 
+      y: 0, 
+      opacity: 1, 
+      duration: 1.2, 
+      ease: "power4.out",
+      onStart: () => {
+        const el = document.querySelector(".hero-title");
+        if (el) el.classList.remove("opacity-0", "translate-y-10");
+      },
+      onComplete: () => {
+        gsap.set(".hero-title", { opacity: 1, y: 0, clearProps: "transform" });
+      }
+    }
+  )
+  .fromTo(".hero-subtitle", 
+    { y: 30, opacity: 0 },
+    { 
+      y: 0, 
+      opacity: 1, 
+      duration: 1.0, 
+      ease: "power3.out",
+      onStart: () => {
+        const el = document.querySelector(".hero-subtitle");
+        if (el) el.classList.remove("opacity-0", "translate-y-10");
+      },
+      onComplete: () => {
+        gsap.set(".hero-subtitle", { opacity: 1, y: 0, clearProps: "transform" });
+      }
+    },
+    "+=0.2" // Play only after the main title has fully finished appearing
+  );
 
   // Parallax the huge full screen background image
   gsap.fromTo("#hero-parallax-wrapper", 
@@ -196,6 +227,20 @@ function initHeroAnimations() {
       }
     }
   );
+
+  // Safety Fallback: If animations are blocked, force visibility
+  setTimeout(() => {
+    const title = document.querySelector(".hero-title");
+    const subtitle = document.querySelector(".hero-subtitle");
+    if (title && (window.getComputedStyle(title).opacity === "0" || title.classList.contains("opacity-0"))) {
+      title.classList.remove("opacity-0", "translate-y-10");
+      gsap.set(title, { opacity: 1, y: 0, clearProps: "transform" });
+    }
+    if (subtitle && (window.getComputedStyle(subtitle).opacity === "0" || subtitle.classList.contains("opacity-0"))) {
+      subtitle.classList.remove("opacity-0", "translate-y-10");
+      gsap.set(subtitle, { opacity: 1, y: 0, clearProps: "transform" });
+    }
+  }, 2500);
 }
 
 // Global scope for frames
@@ -744,6 +789,9 @@ function initPreloader() {
     },
     () => {
         setTimeout(() => {
+            // Trigger hero animations as the preloader fades out for a seamless transition
+            initHeroAnimations();
+            
             gsap.to(preloader, {
                 opacity: 0,
                 duration: 1,
@@ -755,7 +803,6 @@ function initPreloader() {
                     setTimeout(() => {
                         lenis.start();
 
-                        initHeroAnimations();
                         initSequence();
                         initScrollTextReveal();
                         initAdvancedScrollAnimations();
