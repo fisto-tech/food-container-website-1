@@ -62,7 +62,7 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body class="bg-base text-textMain font-sans overflow-x-hidden">
 
@@ -200,13 +200,17 @@
 
         <!-- Content -->
         <div class="relative z-20 flex flex-col items-center justify-center w-full max-w-[1400px] mx-auto px-6 text-center h-full pt-20">
-            <h1 class="hero-title opacity-0 translate-y-10 text-4xl sm:text-6xl md:text-8xl lg:text-[9rem] leading-[1.05] font-serif font-bold mb-8 text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)] tracking-wide">
-                Fresh Fit <br>
-                <span class="text-gold">Reimagined.</span>
-            </h1>
-            <p class="hero-subtitle opacity-0 translate-y-10 text-base md:text-2xl text-textMain max-w-3xl font-light tracking-wide drop-shadow-[0_5px_15px_rgba(0,0,0,0.9)]">
-                Culinary preservation elevated to an art form. Eat Fit is not just storage; it is the ultimate ecosystem for your food.
-            </p>
+            <div class="hero-text-container flex flex-col items-center justify-center">
+                <h1 class="hero-title opacity-0 translate-y-10 text-4xl sm:text-6xl md:text-8xl lg:text-[9rem] leading-[1.05] font-serif font-bold mb-8 text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)] tracking-wide">
+                    <span class="fresh-fit-text inline-block">Fresh Fit</span> <br>
+                    <span class="text-gold inline-block">
+                        <span class="cycled-word inline-block">Reimagined.</span>
+                    </span>
+                </h1>
+                <p class="hero-subtitle opacity-0 translate-y-10 text-base md:text-2xl text-white max-w-3xl font-light tracking-wide drop-shadow-[0_5px_15px_rgba(0,0,0,0.9)]">
+                    Culinary preservation elevated to an art form. Eat Fit is not just storage; it is the ultimate ecosystem for your food.
+                </p>
+            </div>
         </div>
     </section>
 
@@ -548,6 +552,6 @@
     <script src="https://unpkg.com/@studio-freight/lenis@1.0.33/dist/lenis.min.js"></script>
     
     <script>lucide.createIcons();</script>
-    <script src="script.js?v=3"></script>
+    <script src="script.js?v=4"></script>
 </body>
 </html>

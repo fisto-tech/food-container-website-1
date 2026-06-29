@@ -97,9 +97,6 @@ canvas {
   }
 }
 
-/* Prevent FOUC and ensure static initial states for GSAP animations */
-.hero-title,
 .hero-subtitle {
-  opacity: 0;
-  transform: translateY(40px);
+  color: #ffffff !important;
 }

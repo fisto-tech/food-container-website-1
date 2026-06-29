@@ -174,29 +174,96 @@ modal.addEventListener('click', (e) => {
     }
 });
 
+// Cinematic Vapor Condensation Transition for keywords
+function cycleWord(newWord) {
+  const wordEl = document.querySelector(".hero-title .cycled-word");
+  const goldContainer = document.querySelector(".hero-title .text-gold");
+  if (!wordEl) return;
+
+  const tl = gsap.timeline();
+  
+  // Soft golden light flash pulse on the container during transition
+  if (goldContainer) {
+    gsap.fromTo(goldContainer, 
+      { textShadow: "0 0 0px rgba(191, 166, 122, 0)" },
+      { 
+        textShadow: "0 0 25px rgba(191, 166, 122, 0.7)", 
+        duration: 0.45, 
+        yoyo: true, 
+        repeat: 1, 
+        ease: "power2.out" 
+      }
+    );
+  }
+
+  // Dissolve old word
+  tl.to(wordEl, {
+    letterSpacing: "0.25em",
+    filter: "blur(12px)",
+    opacity: 0,
+    duration: 0.45,
+    ease: "power2.in",
+    onComplete: () => {
+      wordEl.textContent = newWord;
+      // Initialize new word in dissolved state
+      gsap.set(wordEl, { letterSpacing: "0.25em", filter: "blur(12px)", opacity: 0 });
+    }
+  })
+  // Condense new word
+  .to(wordEl, {
+    letterSpacing: "0.02em",
+    filter: "blur(0px)",
+    opacity: 1,
+    duration: 0.65,
+    ease: "power2.out"
+  });
+}
+
+// Controller to cycle keywords periodically
+function startWordCycling() {
+  const words = ["Reimagined.", "Preserved.", "Perfected.", "Elevated."];
+  let currentIndex = 0;
+
+  // Cycle keywords every 4 seconds
+  setInterval(() => {
+    currentIndex = (currentIndex + 1) % words.length;
+    cycleWord(words[currentIndex]);
+  }, 4000);
+}
 
 // Hero GSAP Animations (No ThreeJS)
 function initHeroAnimations() {
   const tl = gsap.timeline({ delay: 0.2 });
   
   tl.fromTo(".hero-title", 
-    { y: 40, opacity: 0 },
+    { y: 30, opacity: 0 },
     { 
       y: 0, 
       opacity: 1, 
-      duration: 1.2, 
-      ease: "power4.out",
+      duration: 1.0, 
+      ease: "power3.out",
       onStart: () => {
         const el = document.querySelector(".hero-title");
         if (el) el.classList.remove("opacity-0", "translate-y-10");
       },
       onComplete: () => {
-        gsap.set(".hero-title", { opacity: 1, y: 0, clearProps: "transform" });
+        // Keep final visible state inline explicitly (replaces clearProps)
+        gsap.set(".hero-title", { opacity: 1, y: 0 });
+        startWordCycling();
+        
+        // Gentle organic vertical float for the main "Fresh Fit" text
+        gsap.to(".fresh-fit-text", {
+          y: -8,
+          duration: 5,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1
+        });
       }
     }
   )
   .fromTo(".hero-subtitle", 
-    { y: 30, opacity: 0 },
+    { y: 20, opacity: 0 },
     { 
       y: 0, 
       opacity: 1, 
@@ -207,10 +274,21 @@ function initHeroAnimations() {
         if (el) el.classList.remove("opacity-0", "translate-y-10");
       },
       onComplete: () => {
-        gsap.set(".hero-subtitle", { opacity: 1, y: 0, clearProps: "transform" });
+        // Keep final visible state inline explicitly to prevent turning black
+        gsap.set(".hero-subtitle", { opacity: 1, y: 0 });
+        
+        // Gentle organic vertical float for the subtitle (slightly offset in timing)
+        gsap.to(".hero-subtitle", {
+          y: -5,
+          duration: 5.5,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1,
+          delay: 0.3
+        });
       }
     },
-    "+=0.2" // Play only after the main title has fully finished appearing
+    "-=0.5" // Overlap animations for a smoother and safer flow
   );
 
   // Parallax the huge full screen background image
@@ -228,17 +306,30 @@ function initHeroAnimations() {
     }
   );
 
+  // Scroll parallax with 100px threshold to prevent early fade-out on load
+  gsap.to(".hero-text-container", {
+    yPercent: -20,
+    opacity: 0,
+    ease: "power1.out",
+    scrollTrigger: {
+      trigger: "#hero",
+      start: "top+=100 top",
+      end: "50% top",
+      scrub: true
+    }
+  });
+
   // Safety Fallback: If animations are blocked, force visibility
   setTimeout(() => {
     const title = document.querySelector(".hero-title");
     const subtitle = document.querySelector(".hero-subtitle");
     if (title && (window.getComputedStyle(title).opacity === "0" || title.classList.contains("opacity-0"))) {
       title.classList.remove("opacity-0", "translate-y-10");
-      gsap.set(title, { opacity: 1, y: 0, clearProps: "transform" });
+      gsap.set(title, { opacity: 1, y: 0 });
     }
     if (subtitle && (window.getComputedStyle(subtitle).opacity === "0" || subtitle.classList.contains("opacity-0"))) {
       subtitle.classList.remove("opacity-0", "translate-y-10");
-      gsap.set(subtitle, { opacity: 1, y: 0, clearProps: "transform" });
+      gsap.set(subtitle, { opacity: 1, y: 0 });
     }
   }, 2500);
 }
